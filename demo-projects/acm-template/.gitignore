@@ -2,7 +2,7 @@
 .idea
 target
 code-generator.iml
-generator-basic/acm-template
+acm-template.iml
 
 ### Java template
 # Compiled class file
