@@ -2,6 +2,9 @@ package xyz.kbws.acm;
 
 import java.util.Scanner;
 
+/**
+ * 多个数之和
+ */
 public class MainTemplate {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
