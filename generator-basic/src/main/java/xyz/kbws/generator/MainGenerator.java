@@ -21,6 +21,7 @@ public class MainGenerator {
      */
     public static void doGenerate(Object model) throws IOException, TemplateException {
         String projectPath = System.getProperty("user.dir");
+        System.out.println("projectPath: " + projectPath);
         // 整个项目的根路径
         File parentFile = new File(projectPath).getParentFile();
         // 输入路径
