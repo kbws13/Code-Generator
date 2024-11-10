@@ -6,8 +6,9 @@
   "author": "kbws",
   "createTime": "2024-11-10",
   "fileConfig": {
-    "inputRootPath": "/Users/fangyuan/Project/Code-Generator/demo-projects/acm-template-pro",
+    "inputRootPath": ".source/acm-template-pro",
     "outputRootPath": "generated",
+    "sourceRootPath": "/Users/fangyuan/Project/Code-Generator/demo-projects/acm-template-pro",
     "type": "dir",
     "files": [
       {

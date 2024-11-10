@@ -16,13 +16,13 @@ import java.util.Set;
  * @description:
  */
 public class ScriptGenerator {
-    public static void doGenerator(String outputPath, String jarPath) {
+    public static void doGenerate(String outputPath, String jarPath) {
         // 直接写入脚本文件
         // Linux
         StringBuilder sb = new StringBuilder();
         sb.append("#!/bin/bash").append("\n");
         sb.append(String.format("java -jar %s \"$@\"", jarPath)).append("\n");
-        FileUtil.writeBytes(sb.toString().getBytes(StandardCharsets.UTF_8), outputPath + ".sh");
+        FileUtil.writeBytes(sb.toString().getBytes(StandardCharsets.UTF_8), outputPath);
         // 添加可执行权限
         try {
             Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxrwxrwx");
@@ -40,6 +40,6 @@ public class ScriptGenerator {
 
     public static void main(String[] args) {
         String outputPath = System.getProperty("user.dir") + File.separator + "generator";
-        doGenerator(outputPath, "");
+        doGenerate(outputPath, "");
     }
 }
