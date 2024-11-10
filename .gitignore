@@ -130,3 +130,4 @@ fabric.properties
 
 /acm-template/
 /generator-maker/generated/
+/generator-maker/.temp/
