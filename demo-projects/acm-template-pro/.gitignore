@@ -2,7 +2,7 @@
 .idea
 target
 code-generator.iml
-generator-basic/acm-template
+acm-template.iml
 
 ### Java template
 # Compiled class file
@@ -128,5 +128,3 @@ fabric.properties
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
 
-/acm-template/
-/generator-maker/generated/
