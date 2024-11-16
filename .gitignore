@@ -131,3 +131,5 @@ fabric.properties
 /acm-template/
 /generator-maker/generated/
 /generator-maker/.temp/
+/generator-web-frontend/node_modules/
+/generator-web-backend/data/
