@@ -1,7 +1,9 @@
 package xyz.kbws.maker;
 
 import freemarker.template.TemplateException;
+import xyz.kbws.maker.generator.main.GenerateTemplate;
 import xyz.kbws.maker.generator.main.MainGenerator;
+import xyz.kbws.maker.generator.main.ZipGenerator;
 
 import java.io.IOException;
 
@@ -12,7 +14,8 @@ import java.io.IOException;
  */
 public class Main {
     public static void main(String[] args) throws TemplateException, IOException, InterruptedException {
-        MainGenerator mainGenerator = new MainGenerator();
-        mainGenerator.doGenerate();
+        //MainGenerator mainGenerator = new MainGenerator();
+        GenerateTemplate generateTemplate = new ZipGenerator();
+        generateTemplate.doGenerate();
     }
 }

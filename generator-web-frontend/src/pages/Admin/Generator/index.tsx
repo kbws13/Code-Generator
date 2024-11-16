@@ -57,36 +57,45 @@ const GeneratorAdminPage: React.FC = () => {
             dataIndex: 'id',
             valueType: 'text',
             hideInForm: true,
+            align: 'center'
         },
         {
             title: '名称',
             dataIndex: 'name',
             valueType: 'text',
+            ellipsis: true,
+            align: 'center'
         },
         {
             title: '描述',
             dataIndex: 'description',
             valueType: 'textarea',
+            ellipsis: true,
+            align: 'center'
         },
         {
             title: '基础包',
             dataIndex: 'basePackage',
             valueType: 'text',
+            align: 'center'
         },
         {
             title: '版本',
             dataIndex: 'version',
             valueType: 'text',
+            align: 'center'
         },
         {
             title: '作者',
             dataIndex: 'author',
             valueType: 'text',
+            align: 'center'
         },
         {
             title: '标签',
             dataIndex: 'tags',
             valueType: 'text',
+            align: 'center',
             renderFormItem(schema) {
                 const { fieldProps } = schema;
                 // @ts-ignore
@@ -110,25 +119,30 @@ const GeneratorAdminPage: React.FC = () => {
                 width: 64,
             },
             hideInSearch: true,
+            align: 'center'
         },
         {
             title: '文件配置',
             dataIndex: 'fileConfig',
             valueType: 'jsonCode',
+            align: 'center'
         },
         {
             title: '模型配置',
             dataIndex: 'modelConfig',
             valueType: 'jsonCode',
+            align: 'center'
         },
         {
             title: '产物包路径',
             dataIndex: 'distPath',
             valueType: 'text',
+            align: 'center'
         },
         {
             title: '状态',
             dataIndex: 'status',
+            align: 'center',
             valueEnum: {
                 0: {
                     text: '默认',
@@ -139,27 +153,32 @@ const GeneratorAdminPage: React.FC = () => {
             title: '创建用户',
             dataIndex: 'userId',
             valueType: 'text',
+            align: 'center'
         },
         {
             title: '创建时间',
             sorter: true,
             dataIndex: 'createTime',
-            valueType: 'date',
+            valueType: 'dateTime',
             hideInSearch: true,
             hideInForm: true,
+            align: 'center'
         },
         {
             title: '更新时间',
             sorter: true,
             dataIndex: 'updateTime',
-            valueType: 'date',
+            valueType: 'dateTime',
             hideInSearch: true,
             hideInForm: true,
+            align: 'center'
         },
         {
             title: '操作',
             dataIndex: 'option',
             valueType: 'option',
+            fixed: 'right',
+            align: 'center',
             render: (_, record) => (
                 <Space size="middle">
                     <Typography.Link
@@ -187,6 +206,7 @@ const GeneratorAdminPage: React.FC = () => {
                 headerTitle={'查询表格'}
                 actionRef={actionRef}
                 rowKey="key"
+                scroll={{x: 2000}}
                 search={{
                     labelWidth: 120,
                 }}

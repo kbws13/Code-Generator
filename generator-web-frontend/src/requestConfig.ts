@@ -24,14 +24,14 @@ export const requestConfig: RequestConfig = {
   // 请求拦截器
   requestInterceptors: [
     (config: RequestOptions) => {
-      const token = localStorage.getItem('token') as string;
-      console.log(token);
-      if(token) {
-        config.headers = {
-          ...config.headers,
-          token: token
-        }
-      }
+      // const token = localStorage.getItem('token') as string;
+      // console.log(token);
+      // if(token) {
+      //   config.headers = {
+      //     ...config.headers,
+      //     token: token
+      //   }
+      // }
       return config;
     },
   ],
@@ -46,6 +46,11 @@ export const requestConfig: RequestConfig = {
       const { data } = response as unknown as ResponseStructure;
       if(!data) {
         throw new Error("服务异常")
+      }
+
+      // 文件下载时，直接返回
+      if (requestPath.includes("download")) {
+        return response;
       }
 
       // 错误码处理
