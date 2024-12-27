@@ -1,7 +1,7 @@
 package xyz.kbws.web.model.dto.generator;
 
 import lombok.Data;
-import xyz.kbws.web.meta.Meta;
+import xyz.kbws.maker.meta.Meta;
 
 import java.io.Serializable;
 import java.util.List;

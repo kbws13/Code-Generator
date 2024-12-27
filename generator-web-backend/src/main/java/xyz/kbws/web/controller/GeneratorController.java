@@ -1,10 +1,19 @@
 package xyz.kbws.web.controller;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ZipUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
+import xyz.kbws.maker.generator.main.GenerateTemplate;
+import xyz.kbws.maker.generator.main.ZipGenerator;
+import xyz.kbws.maker.meta.Meta;
+import xyz.kbws.maker.meta.MetaValidator;
 import xyz.kbws.web.annotation.AuthCheck;
 import xyz.kbws.web.common.BaseResponse;
 import xyz.kbws.web.common.DeleteRequest;
@@ -13,11 +22,8 @@ import xyz.kbws.web.common.ResultUtils;
 import xyz.kbws.web.constant.UserConstant;
 import xyz.kbws.web.exception.BusinessException;
 import xyz.kbws.web.exception.ThrowUtils;
-import xyz.kbws.web.meta.Meta;
-import xyz.kbws.web.model.dto.generator.GeneratorAddRequest;
-import xyz.kbws.web.model.dto.generator.GeneratorEditRequest;
-import xyz.kbws.web.model.dto.generator.GeneratorQueryRequest;
-import xyz.kbws.web.model.dto.generator.GeneratorUpdateRequest;
+import xyz.kbws.web.manager.CosManager;
+import xyz.kbws.web.model.dto.generator.*;
 import xyz.kbws.web.model.entity.Generator;
 import xyz.kbws.web.model.entity.User;
 import xyz.kbws.web.model.vo.GeneratorVO;
@@ -26,7 +32,13 @@ import xyz.kbws.web.service.UserService;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author kbws
@@ -43,6 +55,9 @@ public class GeneratorController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private CosManager cosManager;
 
     // region 增删改查
 
@@ -249,4 +264,69 @@ public class GeneratorController {
         return ResultUtils.success(result);
     }
 
+    @PostMapping("/make")
+    @AuthCheck(mustRole = UserConstant.DEFAULT_ROLE)
+    public void makeGenerator(@RequestBody GeneratorMakeRequest generatorMakeRequest,
+                              HttpServletRequest request,
+                              HttpServletResponse response) throws IOException {
+        // 1.输入参数
+        String zipFilePath = generatorMakeRequest.getZipFilePath();
+        Meta meta = generatorMakeRequest.getMeta();
+        User loginUser = userService.getLoginUser(request);
+        // 2.创建独立工作空间，下载压缩包到本地
+        if (StrUtil.isBlank(zipFilePath)) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "压缩包不存在");
+        }
+        // 工作空间
+        String projectPath = System.getProperty("user.dir");
+        // 随机 id
+        String id = IdUtil.getSnowflakeNextId() + RandomUtil.randomString(6);
+        String tempDirPath = String.format("%s/.temp/make/%s", projectPath, id);
+        String localZipFilePath = tempDirPath + "/project.zip";
+
+        // 新建文件
+        if (!FileUtil.exist(localZipFilePath)) {
+            FileUtil.touch(localZipFilePath);
+        }
+
+        try {
+            cosManager.download(zipFilePath, localZipFilePath);
+        } catch (InterruptedException e) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "压缩包下载失败");
+        }
+
+        // 3.解压，得到项目模板文件
+        File unzipDistDir = ZipUtil.unzip(localZipFilePath);
+        // 4.构造 Meta 对象和输出路径
+        String sourceRootPath = unzipDistDir.getAbsolutePath();
+        meta.getFileConfig().setSourceRootPath(sourceRootPath);
+        MetaValidator.doValidAndFill(meta);
+        String outputPath = String.format("%s/generated/%s", tempDirPath, meta.getName());
+
+        // 5.调用maker方法制作生成器
+        GenerateTemplate generateTemplate = new ZipGenerator();
+        try {
+            generateTemplate.doGenerate(meta, outputPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "制作失败");
+        }
+
+        // 6.下载压缩的产物包文件
+        String suffix = "-dist.zip";
+        String zipFileName = meta.getName() + suffix;
+        String distZipFilePath = outputPath + suffix;
+
+        // 下载文件
+        // 设置响应头
+        response.setContentType("application/octet-stream;charset=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=" + zipFileName);
+        // 写入响应
+        Files.copy(Paths.get(distZipFilePath), response.getOutputStream());
+
+        // 7.清理文件
+        CompletableFuture.runAsync(() -> {
+            FileUtil.del(tempDirPath);
+        });
+    }
 }

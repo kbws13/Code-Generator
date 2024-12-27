@@ -2,6 +2,7 @@ package xyz.kbws.maker.generator.file;
 
 
 import cn.hutool.core.io.FileUtil;
+import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -18,6 +19,34 @@ import java.io.Writer;
  */
 public class DynamicFileGenerator {
 
+    public static void doGenerate(String relativeInputPath, String outputPath, Object model) throws IOException, TemplateException {
+        Configuration configuration = new Configuration(Configuration.VERSION_2_3_32);
+
+        int lastSplitIndex = relativeInputPath.lastIndexOf("/");
+        String basePackagePath = relativeInputPath.substring(0, lastSplitIndex);
+        String templateName = relativeInputPath.substring(lastSplitIndex + 1);
+
+        // 指定模板文件所在路径
+        ClassTemplateLoader templateLoader = new ClassTemplateLoader(DynamicFileGenerator.class, basePackagePath);
+        configuration.setTemplateLoader(templateLoader);
+
+        // 设置使用的字符集
+        configuration.setDefaultEncoding("utf-8");
+        // 创建模板对象，加载指定对象
+        Template template = configuration.getTemplate(templateName);
+
+        // 文件不存在就创建文件和父目录
+        if (!FileUtil.exist(outputPath)) {
+            FileUtil.touch(outputPath);
+        }
+
+        // 生成
+        Writer out = new FileWriter(outputPath);
+        template.process(model, out);
+
+        out.close();
+    }
+
     /**
      * 生成文件
      *
@@ -27,7 +56,7 @@ public class DynamicFileGenerator {
      * @throws IOException
      * @throws TemplateException
      */
-    public static void doGenerate(String inputPath, String outputPath, Object model) throws IOException, TemplateException {
+    public static void doGenerateByPath(String inputPath, String outputPath, Object model) throws IOException, TemplateException {
         // new 出 Configuration 对象，参数为 FreeMarker 版本号
         Configuration configuration = new Configuration(Configuration.VERSION_2_3_32);
 

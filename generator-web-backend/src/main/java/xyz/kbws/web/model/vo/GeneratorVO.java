@@ -3,7 +3,7 @@ package xyz.kbws.web.model.vo;
 import cn.hutool.json.JSONUtil;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
-import xyz.kbws.web.meta.Meta;
+import xyz.kbws.maker.meta.Meta;
 import xyz.kbws.web.model.entity.Generator;
 
 import java.io.Serializable;
